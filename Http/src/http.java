@@ -18,15 +18,38 @@ import java.util.Scanner;
 public class http {
 
 
-	 public static void main(String[] args) throws Exception{
+	 public static void main(String[] args) {
+		 try {
+			 if(args.length>=1) {
+				 
+				 // HANDLE VERBIOSE
+				 boolean Notverbiose =true;
+				 if(args.length>=2 && args[1].equals("-v")) {
+					 Notverbiose =false;
+				 }
+				 
+				 //HANDLE REQUEST
+				 if(args[0].toUpperCase().equals("GET")) {
+					 getRequest(Notverbiose,"http://httpbin.org/get?course=networking&assignment=1");
+					 
+				 }else if(args[0].toUpperCase().equals("POST")) {
+					postRequest(Notverbiose,"http://httpbin.org/response-headers","");
+					 
+				 }else {
+					 System.out.println("You entered a wrong cURL Command");
+				 }
+				 
+			 }else {
+				 System.out.println("Please enter some parameters");
+			 }
+			 }catch(Exception e){
+					  System.out.println(e);
+				  }
 		 
-		 getRequest("http://httpbin.org/json");
-		 
-		 //postRequest("http://httpbin.org/response-headers","");
 		 
 	    }
 	 
-	 public static void getRequest(String url) throws Exception {
+	 public static void getRequest(boolean Notverbiose,String url) throws Exception {
 		 InetAddress ip = InetAddress.getByName(new URL(url)
                  .getHost()); 
 		 Socket socket = new Socket(ip,80);
@@ -47,14 +70,20 @@ public class http {
 			 response.append((char) data);
 			 data = in.read();
 		 }
-		 System.out.println(response);
+		 
+		 String responseToString = response.toString();
+		 if(Notverbiose) {
+			 responseToString = responseToString.substring(responseToString.indexOf('{'),responseToString.length());
+		 }
+		 
+		 System.out.println(responseToString);
 		 
 		 in.close();
 		 out.close();
 		 socket.close();
 	 }
 
-	 public static void postRequest(String url,String body) throws Exception {
+	 public static void postRequest(boolean Notverbiose,String url,String body) throws Exception {
 		 InetAddress ip = InetAddress.getByName(new URL(url)
                  .getHost()); 
 		 Socket socket = new Socket(ip,80);
@@ -64,7 +93,7 @@ public class http {
 		 OutputStream out = socket.getOutputStream();
 		 
 		 String request = "POST "+url+" HTTP/1.0\r\n"
-		 		+ "Content-Type:application/x-www-form-urlencoded\r\n"
+		 		+ "Content-Type:application/json\r\n"
 		 		+ "Content-Length: "+body.length()+" \r\n\r\n"
 		 				+ body;
 		 
@@ -79,7 +108,13 @@ public class http {
 			 response.append((char) data);
 			 data = in.read();
 		 }
-		 System.out.println(response);
+		 
+		 String responseToString = response.toString();
+		 if(Notverbiose) {
+			 responseToString = responseToString.substring(responseToString.indexOf('{'),responseToString.length());
+		 }
+		 
+		 System.out.println(responseToString);
 		 
 		 in.close();
 		 out.close();
