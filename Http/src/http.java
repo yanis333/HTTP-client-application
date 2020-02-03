@@ -22,6 +22,8 @@ public class http {
 		 
 		 getRequest("http://httpbin.org/json");
 		 
+		 //postRequest("http://httpbin.org/response-headers","");
+		 
 	    }
 	 
 	 public static void getRequest(String url) throws Exception {
@@ -51,5 +53,36 @@ public class http {
 		 out.close();
 		 socket.close();
 	 }
-	
+
+	 public static void postRequest(String url,String body) throws Exception {
+		 InetAddress ip = InetAddress.getByName(new URL(url)
+                 .getHost()); 
+		 Socket socket = new Socket(ip,80);
+		 
+		 
+		 InputStream in = socket.getInputStream();
+		 OutputStream out = socket.getOutputStream();
+		 
+		 String request = "POST "+url+" HTTP/1.0\r\n"
+		 		+ "Content-Type:application/x-www-form-urlencoded\r\n"
+		 		+ "Content-Length: "+body.length()+" \r\n\r\n"
+		 				+ body;
+		 
+		 out.write(request.getBytes());
+		 out.flush();
+		 
+		 StringBuilder response = new StringBuilder();
+		 
+		 int data = in.read();
+		 
+		 while(data != -1) {
+			 response.append((char) data);
+			 data = in.read();
+		 }
+		 System.out.println(response);
+		 
+		 in.close();
+		 out.close();
+		 socket.close();
+	 }
 }
