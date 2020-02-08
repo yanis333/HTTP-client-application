@@ -105,7 +105,7 @@ public class PostRequest {
 			 }
 			 if(args[x].equals("-f") && (x+1)<args.length) {
 				 f=true;
-				 try(BufferedReader br = new BufferedReader(new FileReader("src/"+args[x+1]))) {
+				 try(BufferedReader br = new BufferedReader(new FileReader(args[x+1]))) {
 					    
 					    String line = br.readLine();
 					    while (line != null) {
