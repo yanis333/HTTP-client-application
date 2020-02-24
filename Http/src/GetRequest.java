@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class GetRequest {
 
@@ -114,9 +115,7 @@ public class GetRequest {
 		 out.flush();
 		 
 		 StringBuilder response = new StringBuilder();
-		 
 		 int data = in.read();
-		 
 		 while(data != -1) {
 			 response.append((char) data);
 			 data = in.read();
@@ -147,13 +146,23 @@ public class GetRequest {
 		 }
 	
 	public void printResponse() throws IOException {
-
 		 if(Notverbiose) {
-			 if(response.indexOf('{') >= 0)
-				 response = response.substring(response.indexOf('{'),response.length());
-			 else
-				 response = response.substring(response.indexOf("<!DOCTYPE"),response.length());
+			 boolean verbioseFound =false;
+			 String substringResponse = "";
+			 Scanner scanner = new Scanner(response);
+			 while (scanner.hasNextLine()) {
+			   String line = scanner.nextLine();
+			   if(line.equals("")) {
+				   verbioseFound =true;
+			   }
+			  if(verbioseFound) {
+				  substringResponse+= line+"\n";
+			  }
+			 }
+			 scanner.close();
+			 response = substringResponse;
 		 }
+		 
 		 if(option !=null) {
 			 writeToFileResponse();
 		 }

@@ -19,6 +19,9 @@ public class httpc {
 		 /*args[6]="-f";
 		 args[7]="file.txt";*/
 		 //args[8] = "http://postman-echo.com/post";*/
+		/* args = new String[3];
+		 args[0]="get";
+		 args[1]="http://localhost/";*/
 		 try {
 				if(args.length==1 && args[0].toUpperCase().equals("HELP")){
 					 Help.generalHelp();
