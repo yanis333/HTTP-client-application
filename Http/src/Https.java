@@ -2,12 +2,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 public class Https {
 	
 	static ServerSocket socketServer;
@@ -23,17 +29,55 @@ public class Https {
 		
 		System.out.println("Client Connected!");
 		
-		 isr = new InputStreamReader(socket.getInputStream());
-		 br = new BufferedReader(isr);
+		InputStream inp = socket.getInputStream();
 		 pw = new PrintWriter(socket.getOutputStream(),true);
 		
 		String info ="";
 		String in ="";
-		
-		while(br.ready() && (in = br.readLine()) != null) {
-			info += in.toString() +"\n";
-		}
-		
+		StringBuilder response = new StringBuilder();
+		 int data = inp.read();
+		 int count=0;
+		 int countLineFeed =0;
+		 int countBody= 0;
+		 int trackbody =0;
+		 boolean check2 =true;
+		 boolean leaveWhileLoop =false;
+		 String request ="";
+		 
+		 while(data != -1) {
+			 if(count == 10) {
+				 request = response.toString().substring(0,response.toString().indexOf("http:")-1);
+			 }
+			 if(count >10) {
+				 if(request.equals("GET")) {
+					 if(countLineFeed == 2)
+						 break;
+				 }
+				 else if(request.equals("POST")) {
+					 if(countLineFeed ==2 && check2) {
+						 countBody = Integer.parseInt(response.toString().substring(response.toString().indexOf("Content-Length")+16,response.toString().length()-1));					 
+						 check2 =false;
+					 }
+					 if(countLineFeed ==3) {
+						 if(trackbody == countBody) {
+							 leaveWhileLoop =true;
+						 }
+						 trackbody++;
+					 }
+					 
+				 }
+			 }
+			 response.append((char) data);
+			 if(leaveWhileLoop) {
+				 break;
+			 }
+			 data = inp.read();
+			 if(data == 10 ) {
+				 countLineFeed++;
+				 }
+			 count++;
+		 }
+		info = response.toString();
 		RequestFromClient(info);
 		
 
@@ -52,12 +96,7 @@ public class Https {
 			}
 		}
 		//GET what inside the '?' --> http://localhost?
-		for(int x=info.indexOf("http:");x<info.length();x++) {
-			if(info.charAt(x) == ' ') {
-				indexOfEndOfURl =x;
-				break;
-			}
-		}
+			indexOfEndOfURl = info.indexOf("HTTP/1.0")-1;
 		path = info.substring(info.indexOf("http:")+16,indexOfEndOfURl);
 		
 		if(path.length()>=2) {

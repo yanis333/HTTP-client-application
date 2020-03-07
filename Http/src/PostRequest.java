@@ -142,10 +142,7 @@ public class PostRequest {
 			 headers+=el;
 	      }
 		 
-		 String request = "POST "+url+" HTTP/1.0\r\n"
-		 		+ headers
-		 		+ "Content-Length: "+body.length()+" \r\n\r\n"
-		 				+ body;
+		 String request = "POST "+url+" HTTP/1.0\r\n"+headers+"Content-Length: "+body.length()+"\r\n\r\n"+body+"";
 		 
 		 out.write(request.getBytes());
 		 out.flush();
@@ -169,10 +166,20 @@ public class PostRequest {
 	public void printResponse() throws IOException {
 
 		if(Notverbiose) {
-			 if(response.indexOf('{') >= 0)
-				 response = response.substring(response.indexOf('{'),response.length());
-			 else
-				 response = response.substring(response.indexOf("<!DOCTYPE"),response.length());
+			boolean verbioseFound =false;
+			 String substringResponse = "";
+			 Scanner scanner = new Scanner(response);
+			 while (scanner.hasNextLine()) {
+			   String line = scanner.nextLine();
+			   if(line.equals("")) {
+				   verbioseFound =true;
+			   }
+			  if(verbioseFound) {
+				  substringResponse+= line+"\n";
+			  }
+			 }
+			 scanner.close();
+			 response = substringResponse;
 		 }
 		 if(option !=null) {
 			 writeToFileResponse();

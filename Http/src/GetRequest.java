@@ -127,9 +127,8 @@ public class GetRequest {
 		 
 		 
 		 
-		 
-		 in.close();
 		 out.close();
+		 in.close();
 		 socket.close();
 		 
 		if(status.equals("3") && counter !=5){
