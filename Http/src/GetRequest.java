@@ -20,6 +20,7 @@ public class GetRequest {
 	private String option;
 	private String status;
 	private int counter;
+	private String specialPath;
 	
 	public GetRequest(String[] args) {
 		counter=0;
@@ -92,6 +93,16 @@ public class GetRequest {
 			 }
 			 
 		 }
+		int counter =0;
+		for(int x=0 ;x<this.url.length();x++) {
+			if(this.url.charAt(x) == '/') {
+				counter++;
+			}
+			if(counter ==3) {
+				specialPath = this.url.substring(0,x);
+				break;
+			}
+		}
 		
 	}
 	
@@ -134,6 +145,12 @@ public class GetRequest {
 		if(status.equals("3") && counter !=5){
 			 url = response.substring(response.indexOf("Location")+10,response.indexOf("Access-Control-Allow-Origin"));
 			 url = url.replaceAll("\r\n","");
+			 try {
+				 ip = InetAddress.getByName(new URL(url)
+			                .getHost()); 
+			 }catch(Exception e){
+				 url = specialPath+url;
+			 }
 			 counter++;
 			 sendRequest();
 		 }else if(counter ==5) {
