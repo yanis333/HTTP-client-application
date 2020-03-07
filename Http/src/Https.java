@@ -24,6 +24,7 @@ public class Https {
 	
 	
 	public static void main(String[] args) throws Exception {
+		while(true) {
 		 socketServer = new ServerSocket(80);
 		  socket = socketServer.accept();
 		
@@ -79,8 +80,10 @@ public class Https {
 		 }
 		info = response.toString();
 		RequestFromClient(info);
-		
-
+		socketServer.close();
+		socket.close();
+		System.out.println("Client Disconnected");
+		}
 	}
 
 	public static void RequestFromClient(String info) {
