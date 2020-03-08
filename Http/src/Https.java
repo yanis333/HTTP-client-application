@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +22,7 @@ public class Https {
 	static InputStreamReader isr;
 	static BufferedReader br;
 	static PrintWriter pw;
-	
+	static String bodyInfo = "";
 	
 	public static void main(String[] args) throws Exception {
 		while(true) {
@@ -63,6 +64,7 @@ public class Https {
 						 if(trackbody == countBody) {
 							 leaveWhileLoop =true;
 						 }
+						  bodyInfo += String.valueOf((char)data);
 						 trackbody++;
 					 }
 					 
@@ -129,7 +131,8 @@ public class Https {
 					}
 				break;
 		
-		case "POST": 
+		case "POST":
+					PostServer(path);
 					break;
 		default : 
 			break;
@@ -166,9 +169,17 @@ public class Https {
 		}
 	}
 	
-	//HAITAM
-	public void PostServer(String path) {
-			
+	//Post 
+	public static void PostServer(String path) {
+		try(PrintWriter writer = new PrintWriter(new FileOutputStream("..\\src\\"+path, false))){
+			writer.println(bodyInfo);
+			writer.close();
+			String format = "{\n\"data\": \"{"+ bodyInfo +"}\",\n}";
+			pw.write("HTTP/1.1 200 OK\r\nContent-Type:text/html\r\nContent-Length:"+format.length()+"\r\n\r\n"+format);
+	        pw.close();
+		}catch(Exception e) {
+			fileNotFound();
+		}
 	}
 		
 	private static void responseWithContentTypeTEXT(File[] allfiles) {
