@@ -183,6 +183,7 @@ public class GetRequest {
 			 writeToFileResponse();
 		 }
 		 else{
+			 System.out.println();
 			 System.out.println(response);
 		 }
 	}

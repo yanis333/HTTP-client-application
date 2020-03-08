@@ -185,6 +185,7 @@ public class PostRequest {
 			 writeToFileResponse();
 		 }
 		 else{
+			 System.out.println();
 			 System.out.println(response);
 		 }
 	}
