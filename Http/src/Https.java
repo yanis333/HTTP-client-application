@@ -23,7 +23,7 @@ public class Https {
 	
 	public static void main(String[] args) throws Exception {
 		
-		 socketServer = new ServerSocket(8080);
+		 socketServer = new ServerSocket(80);
 		 while(true) {
 		 Socket socket = socketServer.accept();
 		 System.out.println("Client Connected");

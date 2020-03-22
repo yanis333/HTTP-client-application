@@ -131,7 +131,7 @@ public class PostRequest {
 	public void sendRequest() throws Exception, MalformedURLException  {
 		ip = InetAddress.getByName(new URL(url)
                 .getHost()); 
-		 Socket socket = new Socket(ip,8080);
+		 Socket socket = new Socket(ip,80);
 		 
 		 
 		 InputStream in = socket.getInputStream();
