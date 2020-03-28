@@ -7,7 +7,7 @@ public class httpc {
 		//FileRequest(Notverbiose,"http://httpbin.org/anything",header,body);
 		// postRequest(Notverbiose,"http://postman-echo.com/post",header,body);
 		//getRequest(Notverbiose,"http://httpbin.org/absolute-redirect/1",header);
-		 /*args = new String[9];
+		/* args = new String[9];
 		 args[0]="post";
 		 args[1]="-v";
 		 args[2]="-h";
@@ -15,15 +15,15 @@ public class httpc {
 		 args[4]="-h";
 		 args[5]="Content-Type:application/json";
 		 args[6]="-d";
-		 args[7]="{Application:1}";
+		 args[7]="{Application:1}";*/
 		 /*args[6]="-f";
-		 args[7]="file.txt";*/
-		 //args[8] = "http://postman-echo.com/post";*/
-		/* args = new String[4];
+		 args[7]="yanis.txt";*/
+		 //args[8] = "http://localhost/post.txt";
+		 /*args = new String[4];
 		 args[0]="get";
 		 args[1] = "-d";
 		 args[2] = "{YANIS:TEXT}";
-		 args[3]="http://localhost/"*/
+		 args[3]="http://localhost/yanis.txt";
 		/*args = new String[2];
 		 args[0]="get";
 		 args[1] = "http://httpbin.org/redirect/2";*/
@@ -34,7 +34,7 @@ public class httpc {
 					 if(args.length == 2 && args[1].toUpperCase().equals("HELP")) {
 						 Help.getHelp();
 					 }else {
-						 GetRequest get = new GetRequest(args);
+						 UDPC_Get get = new UDPC_Get(args);
 						 if(get != null) {
 							 get.sendRequest();}
 						 else {
@@ -46,7 +46,7 @@ public class httpc {
 					 if(args.length == 2 && args[1].toUpperCase().equals("HELP")) {
 						 Help.postHelp();
 					 }else {
-						 PostRequest post = new PostRequest(args);
+						 UDPC_Post post = new UDPC_Post(args);
 						 if(post !=null) {
 							 post.sendRequest();
 						 }else {
