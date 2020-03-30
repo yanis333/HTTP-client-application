@@ -24,93 +24,14 @@ import java.util.Scanner;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 
-public class UDPS {
+public class UDPS extends Thread{
 
     private static final Logger logger = LoggerFactory.getLogger(UDPServer.class);
-    private Map<InetAddress, Map<Integer,ArrayList<Packet>>> clientRegister = new HashMap<InetAddress, Map<Integer,ArrayList<Packet>>>();
+    private  Map<InetAddress, Map<Integer,ArrayList<Packet>>> clientRegister;
+    private  Map<InetAddress, Map<Integer,ArrayList<Packet>>> clientRequest;
     private String bodyInfo = "";
-    private void listenAndServe(int port) throws IOException {
-
-        try (DatagramChannel channel = DatagramChannel.open()) {
-            channel.bind(new InetSocketAddress(port));
-            logger.info("EchoServer is listening at {}", channel.getLocalAddress());
-            ByteBuffer buf = ByteBuffer
-                    .allocate(Packet.MAX_LEN)
-                    .order(ByteOrder.BIG_ENDIAN);
-
-            for (; ; ) {
-                buf.clear();
-                SocketAddress router = channel.receive(buf);
-
-                // Parse a packet from the received raw data.
-                buf.flip();
-                Packet packet = Packet.fromBuffer(buf);
-                buf.flip();
-
-                String payload = new String(packet.getPayload(), UTF_8);
-                logger.info("Packet: {}", packet);
-                logger.info("Payload: {}", payload);
-                logger.info("Router: {}", router);
-
-                // Send the response to the router not the client.
-                // The peer address of the packet is the address of the client already.
-                // We can use toBuilder to copy properties of the current packet.
-                // This demonstrate how to create a new packet from an existing packet.
-                Packet resp = null;
-                switch(packet.getType()) {
-                case 0:
-                	resp = respondHandShake(packet);
-                	channel.send(resp.toBuffer(), router);
-                	break;
-                case 2:
-                	if(clientRegister.containsKey(packet.getPeerAddress())) {
-                		if(clientRegister.get(packet.getPeerAddress()).containsKey(packet.getPeerPort())) {
-                			if(packet.getSequenceNumber() == clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size()) {
-                				resp = packet.toBuilder()
-                		         		.setType(5)
-                		                 .setPayload("DONE".getBytes())
-                		                 .create();
-                				
-                				channel.send(resp.toBuffer(), router);
-                				}else if(packet.getSequenceNumber() < clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size()){
-                					resp = clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).get((int)packet.getSequenceNumber());
-                					channel.send(resp.toBuffer(), router);
-                				}
-                			}else {
-                				ArrayList<Packet> p = new ArrayList<Packet>(10);
-                				clientRegister.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
-                				resp = packet.toBuilder()
-                		         		.setType(6)
-                		                 .setPayload("Waiting for data".getBytes())
-                		                 .create();
-                				channel.send(resp.toBuffer(), router);
-                			}
-                	}else {
-                		ArrayList<Packet> p = new ArrayList<Packet>(10);
-                		clientRegister.put(packet.getPeerAddress(),new HashMap<Integer,ArrayList<Packet>>());
-                		clientRegister.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
-                		resp = packet.toBuilder()
-        		         		.setType(6)
-        		                 .setPayload("Waiting for data".getBytes())
-        		                 .create();
-                		channel.send(resp.toBuffer(), router);
-                	}
-                	break;
-                case 3:
-                	resp = handleRequest(packet,payload);
-                	channel.send(resp.toBuffer(), router);
-                	break;
-                }
-                
-                	
-                
-
-            }
-        }
-        
-    }
     
-    private Packet handleRequest(Packet packet,String payload) {
+	private Packet handleRequest(Packet packet,String payload) {
     	//Is it GET OR POST
     	String request = payload.substring(0,payload.indexOf("http:")-1);
     	if(request.equals("POST")) {
@@ -280,9 +201,121 @@ public class UDPS {
     	String resp ="HTTP/1.0 403 Forbidden";
 		return RespToPacket(packet,resp);
 	}
+   
+    private void listenAndServe(int port) throws IOException {
+    	clientRegister =new HashMap<InetAddress, Map<Integer,ArrayList<Packet>>>();
+		clientRequest = new HashMap<InetAddress, Map<Integer,ArrayList<Packet>>>();
+        try (DatagramChannel channel = DatagramChannel.open()) {
+            channel.bind(new InetSocketAddress(port));
+            logger.info("EchoServer is listening at {}", channel.getLocalAddress());
+            ByteBuffer buf = ByteBuffer
+                    .allocate(Packet.MAX_LEN)
+                    .order(ByteOrder.BIG_ENDIAN);
 
+            for (; ; ) {
+                buf.clear();
+                SocketAddress router = channel.receive(buf);
+
+                // Parse a packet from the received raw data.
+                buf.flip();
+                Packet packet = Packet.fromBuffer(buf);
+                buf.flip();
+
+                String payload = new String(packet.getPayload(), UTF_8);
+                logger.info("Packet: {}", packet);
+                logger.info("Payload: {}", payload);
+                logger.info("Router: {}", router);
+
+                Packet resp =null;
+        		switch(packet.getType()) {
+                case 0:
+                	resp = respondHandShake(packet);
+                	channel.send(resp.toBuffer(), router);
+                	break;
+                case 2:
+                	if(clientRegister.containsKey(packet.getPeerAddress())) {
+                		if(clientRegister.get(packet.getPeerAddress()).containsKey(packet.getPeerPort())) {
+                			if(clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size() == 0 ||packet.getSequenceNumber() == clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size()) {
+                				resp = packet.toBuilder()
+                		         		.setType(5)
+                		                 .setPayload("DONE".getBytes())
+                		                 .create();
+                				
+                				channel.send(resp.toBuffer(), router);
+                				}else if(packet.getSequenceNumber() < clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size()){
+                					resp = clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).get((int)packet.getSequenceNumber());
+                					channel.send(resp.toBuffer(), router);
+                				}
+                			}else {
+                				ArrayList<Packet> p = new ArrayList<Packet>(10);
+                				clientRegister.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
+                				
+                				p = new ArrayList<Packet>(10);
+                				clientRequest.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
+                				
+                				resp = packet.toBuilder()
+                		         		.setType(6)
+                		                 .setPayload("Waiting for data".getBytes())
+                		                 .create();
+                				channel.send(resp.toBuffer(), router);
+                			}
+                	}else {
+                		ArrayList<Packet> p = new ArrayList<Packet>(10);
+                		clientRegister.put(packet.getPeerAddress(),new HashMap<Integer,ArrayList<Packet>>());
+                		clientRegister.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
+                		
+                		p = new ArrayList<Packet>(10);
+                		clientRequest.put(packet.getPeerAddress(),new HashMap<Integer,ArrayList<Packet>>());
+                		clientRequest.get(packet.getPeerAddress()).put(packet.getPeerPort(),p);
+                		
+                		resp = packet.toBuilder()
+        		         		.setType(6)
+        		                 .setPayload("Waiting for data".getBytes())
+        		                 .create();
+                		channel.send(resp.toBuffer(), router);
+                	}
+                	break;
+                case 3:
+                	ArrayList<Packet> allPacketOfClient = clientRequest.get(packet.getPeerAddress()).get(packet.getPeerPort());
+                	try {
+                		Packet vy = allPacketOfClient.get((int)packet.getSequenceNumber()-1);
+                		
+                		
+                	}catch(Exception e) {
+                		allPacketOfClient.add((int)packet.getSequenceNumber()-1,packet);
+                		clientRequest.get(packet.getPeerAddress()).put(packet.getPeerPort(),allPacketOfClient);
+                	}
+                	resp = packet.toBuilder()
+        	         		.setType(2)
+        	                 .setPayload("AKN".getBytes())
+        	                 .create();
+            		channel.send(resp.toBuffer(), router);
+                	break;
+                
+                case 5:
+                	if(clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).size() == 0) {
+                    	ArrayList<Packet> allPacketOfClientForRequest = clientRequest.get(packet.getPeerAddress()).get(packet.getPeerPort());
+                    	String payloadClient ="";
+                    	for(int x=0;x<allPacketOfClientForRequest.size();x++) {
+                    		payloadClient+= new String(allPacketOfClientForRequest.get(x).getPayload(), UTF_8);
+                    	}
+                        	resp = handleRequest(packet,payloadClient);
+                        	channel.send(resp.toBuffer(), router);
+                    }else {
+                    	resp = clientRegister.get(packet.getPeerAddress()).get(packet.getPeerPort()).get(0);
+                    	channel.send(resp.toBuffer(), router);
+                    }
+                	
+                	break;
+                }
+                
+            }
+        }
+        
+        
+    }
+    
     public static void main(String[] args) throws IOException {
-    	while(true) {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(asList("port", "p"), "Listening port")
                 .withOptionalArg()
@@ -292,6 +325,7 @@ public class UDPS {
         int port = Integer.parseInt((String) opts.valueOf("port"));
         UDPS server = new UDPS();
         server.listenAndServe(port);
-        }
     }
-}
+    }
+    
+    

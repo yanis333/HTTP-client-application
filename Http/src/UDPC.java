@@ -1,9 +1,9 @@
 
 
-public class httpc {
+public class UDPC {
 
 
-	 public static void main(String[] args) {
+	 public static void main(String[] args,int number) {
 		//FileRequest(Notverbiose,"http://httpbin.org/anything",header,body);
 		// postRequest(Notverbiose,"http://postman-echo.com/post",header,body);
 		//getRequest(Notverbiose,"http://httpbin.org/absolute-redirect/1",header);
@@ -34,7 +34,7 @@ public class httpc {
 					 if(args.length == 2 && args[1].toUpperCase().equals("HELP")) {
 						 Help.getHelp();
 					 }else {
-						 UDPC_Get get = new UDPC_Get(args);
+						 UDPC_Get get = new UDPC_Get(args,number);
 						 if(get != null) {
 							 get.sendRequest();}
 						 else {
@@ -46,7 +46,7 @@ public class httpc {
 					 if(args.length == 2 && args[1].toUpperCase().equals("HELP")) {
 						 Help.postHelp();
 					 }else {
-						 UDPC_Post post = new UDPC_Post(args);
+						 UDPC_Post post = new UDPC_Post(args,number);
 						 if(post !=null) {
 							 post.sendRequest();
 						 }else {

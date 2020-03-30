@@ -6,7 +6,37 @@ public class ThreadTest {
 		args1[0] = "post";
 		args1[1] = "-v";
 		args1[2] = "-d";
-		args1[3] = "{Applicaiton_Thread_POST2}";
+		args1[3] = "{"
+				+"FIRST PART"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,,\n\n"
+				+ "Second Part"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,,\n\n"
+				+"Third PART"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,\n\n"
+				+"Fourth PART"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,"
+				+ "Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,Applicaiton_Thread_POST2,}";
 		args1[4] = "http://localhost/yanis.txt";
 		
 		
@@ -38,12 +68,12 @@ public class ThreadTest {
 		args6[1] = "-v";
 		args6[2] = "http://localhost/../doesNotExist.txt";
 		
-		Thread one = new Thread(() -> httpc.main(args1));
-        Thread two = new Thread(() -> httpc.main(args2));
-        Thread three = new Thread(() -> httpc.main(args3));
-        Thread four = new Thread(() -> httpc.main(args4));
-        Thread five = new Thread(() -> httpc.main(args5));
-        Thread six = new Thread(() -> httpc.main(args6));
+		Thread one = new Thread(() -> UDPC.main(args1,1));
+        Thread two = new Thread(() -> UDPC.main(args2,2));
+       Thread three = new Thread(() -> UDPC.main(args3,3));
+        Thread four = new Thread(() -> UDPC.main(args4,4));
+        Thread five = new Thread(() -> UDPC.main(args5,5));
+        Thread six = new Thread(() -> UDPC.main(args6,6));
 
         one.start();
         two.start();

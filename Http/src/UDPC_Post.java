@@ -20,6 +20,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -43,10 +44,13 @@ public class UDPC_Post {
 	private int serverPort;
 	private SocketAddress routerAddress;
 	private InetSocketAddress serverAddress;
+	private ArrayList<Packet> requestInPacket = new ArrayList<Packet>(10);
+	private int number;
 	
 	private String routerHost;
 	
-	public UDPC_Post(String[] args) {
+	public UDPC_Post(String[] args,int number) {
+		this.number=number;
 		header = new ArrayList<String>();
 		url ="";
 		response= "";
@@ -163,24 +167,93 @@ public class UDPC_Post {
 		 
 		 try(DatagramChannel channel = DatagramChannel.open()){
 			 handShakeWithServer(channel);
-			 
-			 Packet packet = sendRequestToServer(channel,request,3,1);
-			 while(packet.getType() != 5) {
-				 this.response+= new String(packet.getPayload(), StandardCharsets.UTF_8);
-			  packet = sendRequestToServer(channel,"AKN-Data",2,packet.getSequenceNumber());
+			 Packet packet = null;
+			 boolean notFinish =true;
+			 RespToPacket(request);
+			 System.out.println("#"+this.number+"		Start sending request");
+			 for(int x=0;x<this.requestInPacket.size();x++) {
+				 
+				  packet = sendRequestToServer(channel,request,3,1,this.requestInPacket.get(x));
+				  
+				  while(packet == null || packet.getType() !=2) {
+					  System.out.println("#"+this.number+"    Resending part of request #"+this.requestInPacket.get(x).getSequenceNumber());
+						 packet = sendRequestToServer(channel,request,3,1,this.requestInPacket.get(x));
+					 }
 			 }
+			 
+			 ArrayList<Packet> allPacket = new ArrayList<Packet>(10); 
+			 System.out.println("#"+this.number+"    Start Getting data");
+			 packet = sendRequestToServer(channel,"Get-Data",5,1,null);
+			 
+			 while(packet == null || packet.getType() !=4 ) {
+				 packet = sendRequestToServer(channel,"Get-Data",5,1,null);
+			 }
+			 allPacket.add(0,packet);
+			 System.out.println("#"+this.number+"    Getting Packets");
+			 	long sequence =packet.getSequenceNumber();
+			 	packet = sendRequestToServer(channel,"AKN",2,packet.getSequenceNumber(),null);
+			 	
+			 	while(notFinish) {
+			 		if(packet == null) {
+			 			System.out.println("#"+this.number+"    re asking for packets lost");
+			 			packet = sendRequestToServer(channel,"AKN",2,sequence,null);
+			 		}else if(packet.getType() == 5){
+			 			System.out.println("#"+this.number+"    finished getting packets");
+			 			notFinish = false;
+			 		}else if(packet.getType() == 4) {
+			 			try {
+			 				Packet x = allPacket.get((int)packet.getSequenceNumber()-1);
+			 				System.out.println("#"+this.number+"    Already received packet #"+packet.getSequenceNumber());
+			 			}catch(Exception e) {
+			 				allPacket.add((int)packet.getSequenceNumber()-1,packet);
+			 				System.out.println("#"+this.number+"    New packet added to the list");
+			 			}
+			 			sequence = packet.getSequenceNumber();
+			 			packet = sendRequestToServer(channel,"AKN",2,sequence,null);
+			 		}
+			 	}
+			 	for(int x =0 ; x<allPacket.size();x++) {
+			 		this.response+= new String(allPacket.get(x).getPayload(), StandardCharsets.UTF_8);
+			 	}
 		 }
 		  printResponse();
 		 }
-	private Packet sendRequestToServer(DatagramChannel channel, String request, int type,long sequenceNumber) throws IOException {
+	private void RespToPacket(String resp) {
+		double lgt = resp.length();
+		double maxSize =1013;
+		double count = Math.ceil(lgt /maxSize);
+		Packet p =null;
+		String message ="";
+		for(int x =1;x<=count;x++) {
+			if(x<count) {
+			message = resp.substring((x-1)*1013,x*1013);
+			}else {
+				message = resp.substring((x-1)*1013,resp.length());
+			}
+			 p = new Packet.Builder()
+                    .setType(3)
+                    .setSequenceNumber(x)
+                    .setPortNumber(serverAddress.getPort())
+                    .setPeerAddress(serverAddress.getAddress())
+                    .setPayload(message.getBytes())
+                    .create();
+			
+			 requestInPacket.add(p);
+		}
 		
-            Packet p = new Packet.Builder()
+	}
+	
+	private Packet sendRequestToServer(DatagramChannel channel, String request, int type,long sequenceNumber,Packet p) throws IOException {
+		
+		if(p == null) {
+             p = new Packet.Builder()
                     .setType(type)
                     .setSequenceNumber(sequenceNumber)
                     .setPortNumber(serverAddress.getPort())
                     .setPeerAddress(serverAddress.getAddress())
                     .setPayload(request.getBytes())
                     .create();
+            }
             channel.send(p.toBuffer(), routerAddress);
 	 		 
 			 channel.configureBlocking(false);
@@ -191,6 +264,7 @@ public class UDPC_Post {
 		     Set<SelectionKey> keys = selector.selectedKeys();
 		     if(keys.isEmpty()){
 		     	System.out.println("No response after timeout");
+		     	keys.clear();
 		         return null;
 		     }
 		
@@ -235,76 +309,27 @@ public class UDPC_Post {
         serverAddress = new InetSocketAddress(serverHost, serverPort);
 	}
 	private void handShakeWithServer(DatagramChannel channel) throws IOException {
+		Packet ans = null;
 		setSettings();
-            String msg = "Hi S";
-            Packet p = new Packet.Builder()
-                    .setType(0)
-                    .setSequenceNumber(1L)
-                    .setPortNumber(serverAddress.getPort())
-                    .setPeerAddress(serverAddress.getAddress())
-                    .setPayload(msg.getBytes())
-                    .create();
-            channel.send(p.toBuffer(), routerAddress);
-
-            //logger.info("Sending \"{}\" to router at {}", msg, routerAddr);
-
-            // Try to receive a packet within timeout.
-            channel.configureBlocking(false);
-            Selector selector = Selector.open();
-            channel.register(selector, OP_READ);
-            System.out.println("Sending SYN to server!");
-            System.out.println("Waiting for the response!");
-            //logger.info("Waiting for the response");
-            selector.select(5000);
-
-            Set<SelectionKey> keys = selector.selectedKeys();
-            if(keys.isEmpty()){
-            	System.out.println("No response after timeout");
-                //logger.error("No response after timeout");
-                return;
-            }
-
-            // We just want a single response.
-            ByteBuffer buf = ByteBuffer.allocate(Packet.MAX_LEN);
-            SocketAddress router = channel.receive(buf);
-            buf.flip();
-            Packet resp = Packet.fromBuffer(buf);
-            String payload = new String(resp.getPayload(), StandardCharsets.UTF_8);
-            keys.clear();
-            if(resp.getType() == 1) {
-            	System.out.println("Answer from the server : "+payload);
-            
-            msg = "AKN";
-            p = new Packet.Builder()
-                    .setType(2)
-                    .setSequenceNumber(1L)
-                    .setPortNumber(serverAddress.getPort())
-                    .setPeerAddress(serverAddress.getAddress())
-                    .setPayload(msg.getBytes())
-                    .create();
-            channel.send(p.toBuffer(), routerAddress);
-            channel.configureBlocking(false);
-            selector = Selector.open();
-            channel.register(selector, OP_READ);
-            selector.select(5000);
-
-            keys = selector.selectedKeys();
-            if(keys.isEmpty()){
-            	System.out.println("No response after timeout");
-                //logger.error("No response after timeout");
-                return;
-            }
-
-            // We just want a single response.
-            buf = ByteBuffer.allocate(Packet.MAX_LEN);
-            router = channel.receive(buf);
-            buf.flip();
-            resp = Packet.fromBuffer(buf);
-            payload = new String(resp.getPayload(), StandardCharsets.UTF_8);
-            keys.clear();
-        }else {
-        	System.out.println("ERROR IN THE SERVER");
-        }
+		String msg= "Hi S";
+		System.out.println("#"+this.number+"    "+msg);
+		ans = sendRequestToServer(channel,msg,0,1,null);
+		
+		while(ans == null || ans.getType() != 1) {
+			System.out.println("#"+this.number+"    "+msg);
+			ans = sendRequestToServer(channel,msg,0,1,null);
+		}
+		
+		System.out.println("#"+this.number+"		Answer from the server : "+new String(ans.getPayload(), StandardCharsets.UTF_8));
+		
+		msg= "AKN";
+		System.out.println("#"+this.number+"    "+msg);
+		ans = sendRequestToServer(channel,msg,2,1,null);
+		
+		while(ans == null) {
+			System.out.println("#"+this.number+"    "+msg);
+			ans = sendRequestToServer(channel,msg,2,1,null);
+		}
 		
 	}
 
